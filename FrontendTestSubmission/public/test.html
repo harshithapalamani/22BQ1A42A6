@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener - Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="url"],
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #1976d2;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #1565c0;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e8;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔗 URL Shortener</h1>
+        <p>Create short URLs quickly and easily!</p>
+
+        <form id="urlForm">
+            <div class="form-group">
+                <label for="url">Long URL:</label>
+                <input type="url" id="url" placeholder="https://example.com/very/long/url" required>
+            </div>
+
+            <div class="form-group">
+                <label for="validity">Validity (minutes):</label>
+                <input type="number" id="validity" value="30" min="1">
+            </div>
+
+            <div class="form-group">
+                <label for="shortcode">Custom Shortcode (optional):</label>
+                <input type="text" id="shortcode" placeholder="abcd1" pattern="[a-zA-Z0-9]{1,10}">
+            </div>
+
+            <button type="submit">Shorten URL</button>
+        </form>
+
+        <div id="result" class="result"></div>
+
+        <hr style="margin: 40px 0;">
+
+        <h2>📊 Statistics</h2>
+        <button onclick="loadStats()">Load All URLs</button>
+        <div id="stats" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+
+        // Custom Logger (no console.log as per requirements)
+        class CustomLogger {
+            constructor() {
+                this.logs = JSON.parse(localStorage.getItem('url_shortener_logs') || '[]');
+            }
+
+            log(level, message, meta = {}) {
+                const entry = {
+                    timestamp: new Date().toISOString(),
+                    level: level.toUpperCase(),
+                    message,
+                    ...meta
+                };
+                this.logs.push(entry);
+                if (this.logs.length > 100) this.logs.shift();
+                localStorage.setItem('url_shortener_logs', JSON.stringify(this.logs));
+            }
+
+            info(msg, meta) { this.log('info', msg, meta); }
+            error(msg, meta) { this.log('error', msg, meta); }
+        }
+
+        const logger = new CustomLogger();
+
+        document.getElementById('urlForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const url = document.getElementById('url').value;
+            const validity = parseInt(document.getElementById('validity').value) || 30;
+            const shortcode = document.getElementById('shortcode').value;
+
+            const resultDiv = document.getElementById('result');
+
+            try {
+                logger.info('Creating short URL', { url, validity, shortcode });
+
+                const response = await fetch(`${API_BASE}/shorturls`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        url,
+                        validity,
+                        ...(shortcode && { shortcode })
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = 'result';
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <h3>✅ Short URL Created!</h3>
+                        <p><strong>Short Link:</strong> <a href="${data.shortLink}" target="_blank">${data.shortLink}</a></p>
+                        <p><strong>Expires:</strong> ${new Date(data.expiry).toLocaleString()}</p>
+                        <button onclick="copyToClipboard('${data.shortLink}')">Copy Link</button>
+                    `;
+                    logger.info('Short URL created successfully', data);
+                } else {
+                    throw new Error(data.error || 'Failed to create short URL');
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<h3>❌ Error</h3><p>${error.message}</p>`;
+                logger.error('Failed to create short URL', { error: error.message });
+            }
+        });
+
+        async function loadStats() {
+            const statsDiv = document.getElementById('stats');
+
+            try {
+                logger.info('Loading statistics');
+
+                const response = await fetch(`${API_BASE}/shorturls`);
+                const urls = await response.json();
+
+                if (response.ok) {
+                    statsDiv.innerHTML = `
+                        <h3>All URLs (${urls.length})</h3>
+                        ${urls.map(url => `
+                            <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                                <p><strong>Short:</strong> <a href="${url.shortLink}" target="_blank">${url.shortLink}</a></p>
+                                <p><strong>Original:</strong> ${url.originalUrl}</p>
+                                <p><strong>Clicks:</strong> ${url.totalClicks}</p>
+                                <p><strong>Created:</strong> ${new Date(url.createdAt).toLocaleString()}</p>
+                                <p><strong>Expires:</strong> ${new Date(url.expiryDate).toLocaleString()}</p>
+                                <p><strong>Status:</strong> ${new Date() > new Date(url.expiryDate) ? '❌ Expired' : '✅ Active'}</p>
+                            </div>
+                        `).join('')}
+                    `;
+                    logger.info(`Loaded ${urls.length} URLs`);
+                } else {
+                    throw new Error('Failed to load statistics');
+                }
+            } catch (error) {
+                statsDiv.innerHTML = `<p style="color: red;">Error loading statistics: ${error.message}</p>`;
+                logger.error('Failed to load statistics', { error: error.message });
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                logger.info('URL copied to clipboard', { url: text });
+                alert('URL copied to clipboard!');
+            });
+        }
+
+        // Auto-load stats on page load
+        window.addEventListener('load', loadStats);
+    </script>
+</body>
+
+</html>
