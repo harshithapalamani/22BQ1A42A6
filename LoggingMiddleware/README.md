@@ -13,20 +13,34 @@ A custom logging middleware for Express.js applications that provides structured
 ## Usage
 
 ```javascript
+<<<<<<< HEAD
 const CustomLogger = require("./index");
 
 const logger = new CustomLogger({
   logLevel: "info",
   logFile: "./logs/app.log",
   enableConsole: false, // Set to true only for development
+=======
+const CustomLogger = require('./index');
+
+const logger = new CustomLogger({
+  logLevel: 'info',
+  logFile: './logs/app.log',
+  enableConsole: false // Set to true only for development
+>>>>>>> 23a406f5b4a04b91567ebabe8b561535bdc700ea
 });
 
 // Use as Express middleware
 app.use(logger.expressMiddleware());
 
 // Manual logging
+<<<<<<< HEAD
 logger.info("Application started");
 logger.error("An error occurred", { error: err.message });
+=======
+logger.info('Application started');
+logger.error('An error occurred', { error: err.message });
+>>>>>>> 23a406f5b4a04b91567ebabe8b561535bdc700ea
 ```
 
 ## Installation

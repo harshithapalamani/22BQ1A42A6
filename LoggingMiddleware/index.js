@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const fetch = require('node-fetch');
 
 /**
@@ -61,6 +62,61 @@ class CustomLogger {
 
   async fatal(message, meta = {}) {
     await Log('backend', 'fatal', meta.package || 'handler', message);
+=======
+const fs = require('fs');
+const path = require('path');
+
+class CustomLogger {
+  constructor(options = {}) {
+    this.logLevel = options.logLevel || 'info';
+    this.logFile = options.logFile || path.join(__dirname, 'logs', 'app.log');
+    this.enableConsole = options.enableConsole || false;
+    
+    // Ensure logs directory exists
+    const logDir = path.dirname(this.logFile);
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+  }
+
+  formatMessage(level, message, meta = {}) {
+    const timestamp = new Date().toISOString();
+    const logEntry = {
+      timestamp,
+      level: level.toUpperCase(),
+      message,
+      ...meta
+    };
+    return JSON.stringify(logEntry) + '\n';
+  }
+
+  writeLog(level, message, meta = {}) {
+    const formattedMessage = this.formatMessage(level, message, meta);
+    
+    // Write to file
+    fs.appendFileSync(this.logFile, formattedMessage);
+    
+    // Optionally write to console (only for development)
+    if (this.enableConsole) {
+      console.log(formattedMessage.trim());
+    }
+  }
+
+  info(message, meta = {}) {
+    this.writeLog('info', message, meta);
+  }
+
+  error(message, meta = {}) {
+    this.writeLog('error', message, meta);
+  }
+
+  warn(message, meta = {}) {
+    this.writeLog('warn', message, meta);
+  }
+
+  debug(message, meta = {}) {
+    this.writeLog('debug', message, meta);
+>>>>>>> 23a406f5b4a04b91567ebabe8b561535bdc700ea
   }
 
   // Express middleware function
@@ -70,21 +126,33 @@ class CustomLogger {
       
       // Log request
       this.info('Incoming request', {
+<<<<<<< HEAD
         package: 'route',
         method: req.method,
         url: req.url,
         ip: req.ip,
         userAgent: req.get('User-Agent')
+=======
+        method: req.method,
+        url: req.url,
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+        timestamp: new Date().toISOString()
+>>>>>>> 23a406f5b4a04b91567ebabe8b561535bdc700ea
       });
 
       // Capture response
       res.on('finish', () => {
         const duration = Date.now() - start;
+<<<<<<< HEAD
         const level = res.statusCode >= 400 ? 'error' : 'info';
         const packageName = res.statusCode >= 500 ? 'handler' : 'route';
         
         this[level]('Request completed', {
           package: packageName,
+=======
+        this.info('Request completed', {
+>>>>>>> 23a406f5b4a04b91567ebabe8b561535bdc700ea
           method: req.method,
           url: req.url,
           statusCode: res.statusCode,
@@ -98,6 +166,10 @@ class CustomLogger {
   }
 }
 
+<<<<<<< HEAD
 // Export both the main Log function and the helper class
 module.exports = Log;
 module.exports.CustomLogger = CustomLogger;
+=======
+module.exports = CustomLogger;
+>>>>>>> 23a406f5b4a04b91567ebabe8b561535bdc700ea
