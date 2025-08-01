@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+require('dotenv').config();
 
 /**
  * Custom Logging Middleware for Assignment
@@ -23,7 +24,7 @@ async function Log(stack, level, packageName, message) {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiYXVkIjoiaHR0cDovLzIwLjI0NC41Ni4xNDQvZXZhbHVhdGlvbi1zZXJ2aWNlIiwiZW1haWwiOiIyMmJxMWE0MmE2QHZ2aXQubmV0IiwiZXhwIjoxNzU0MDMzNzkwLCJpYXQiOjE3NTQwMzI4OTAsImlzcyI6IkFmZm9yZCBNZWRpY2FsIFRlY2hub2xvZ2llcyBQcml2YXRlIExpbWl0ZWQiLCJqdGkiOiJkZTExNDE0Yi01NjMwLTQwYTItYjRjMy1hNTc1MGM0YmI2YTciLCJsb2NhbGUiOiJlbi1JTiIsIm5hbWUiOiJwYWxhbWFuaSBzcmkgaGFyc2hpdGhhIiwic3ViIjoiMWJmODQyNTktOWRjMC00MjRkLTk3ODgtNjcwNzUxMWUyODI5In0sImVtYWlsIjoiMjJicTFhNDJhNkB2dml0Lm5ldCIsIm5hbWUiOiJwYWxhbWFuaSBzcmkgaGFyc2hpdGhhIiwicm9sbE5vIjoiMjJicTFhNDJhNiIsImFjY2Vzc0NvZGUiOiJQblZCRlYiLCJjbGllbnRJRCI6IjFiZjg0MjU5LTlkYzAtNDI0ZC05Nzg4LTY3MDc1MTFlMjgyOSIsImNsaWVudFNlY3JldCI6IndnZENXQWZ6cHdCQWdGWVoifQ.cAvuHLSNiOuvqd9TQjE6EDVZxcDVm-3dsAdekqPlQt8'
+        'Authorization': `Bearer ${process.env.EVALUATION_TOKEN || 'YOUR_TOKEN_HERE'}`
       },
       body: JSON.stringify(payload)
     });
