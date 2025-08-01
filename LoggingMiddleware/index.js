@@ -23,14 +23,12 @@ async function Log(stack, level, packageName, message) {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiYXVkIjoiaHR0cDovLzIwLjI0NC41Ni4xNDQvZXZhbHVhdGlvbi1zZXJ2aWNlIiwiZW1haWwiOiIyMmJxMWE0MmE2QHZ2aXQubmV0IiwiZXhwIjoxNzU0MDMwNjI5LCJpYXQiOjE3NTQwMjk3MjksImlzcyI6IkFmZm9yZCBNZWRpY2FsIFRlY2hub2xvZ2llcyBQcml2YXRlIExpbWl0ZWQiLCJqdGkiOiIzNWY2MjAxNi1hNTBjLTRlMmUtOTUzNi0yMTY3MzM5Yjg3MmYiLCJsb2NhbGUiOiJlbi1JTiIsIm5hbWUiOiJwYWxhbWFuaSBzcmkgaGFyc2hpdGhhIiwic3ViIjoiMWJmODQyNTktOWRjMC00MjRkLTk3ODgtNjcwNzUxMWUyODI5In0sImVtYWlsIjoiMjJicTFhNDJhNkB2dml0Lm5ldCIsIm5hbWUiOiJwYWxhbWFuaSBzcmkgaGFyc2hpdGhhIiwicm9sbE5vIjoiMjJicTFhNDJhNiIsImFjY2Vzc0NvZGUiOiJQblZCRlYiLCJjbGllbnRJRCI6IjFiZjg0MjU5LTlkYzAtNDI0ZC05Nzg4LTY3MDc1MTFlMjgyOSIsImNsaWVudFNlY3JldCI6IndnZENXQWZ6cHdCQWdGWVoifQ.GbONWiiz5JafkQ-ag6K3c8Y0V44CHR5vk5H4W9Tl1cE'
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiYXVkIjoiaHR0cDovLzIwLjI0NC41Ni4xNDQvZXZhbHVhdGlvbi1zZXJ2aWNlIiwiZW1haWwiOiIyMmJxMWE0MmE2QHZ2aXQubmV0IiwiZXhwIjoxNzU0MDMzNzkwLCJpYXQiOjE3NTQwMzI4OTAsImlzcyI6IkFmZm9yZCBNZWRpY2FsIFRlY2hub2xvZ2llcyBQcml2YXRlIExpbWl0ZWQiLCJqdGkiOiJkZTExNDE0Yi01NjMwLTQwYTItYjRjMy1hNTc1MGM0YmI2YTciLCJsb2NhbGUiOiJlbi1JTiIsIm5hbWUiOiJwYWxhbWFuaSBzcmkgaGFyc2hpdGhhIiwic3ViIjoiMWJmODQyNTktOWRjMC00MjRkLTk3ODgtNjcwNzUxMWUyODI5In0sImVtYWlsIjoiMjJicTFhNDJhNkB2dml0Lm5ldCIsIm5hbWUiOiJwYWxhbWFuaSBzcmkgaGFyc2hpdGhhIiwicm9sbE5vIjoiMjJicTFhNDJhNiIsImFjY2Vzc0NvZGUiOiJQblZCRlYiLCJjbGllbnRJRCI6IjFiZjg0MjU5LTlkYzAtNDI0ZC05Nzg4LTY3MDc1MTFlMjgyOSIsImNsaWVudFNlY3JldCI6IndnZENXQWZ6cHdCQWdGWVoifQ.cAvuHLSNiOuvqd9TQjE6EDVZxcDVm-3dsAdekqPlQt8'
       },
       body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
-      // Fallback logging (but avoid console.log as per requirements)
-      // Using console.error only for critical logging failures
       console.error('Failed to log:', await response.text());
     }
   } catch (err) {
